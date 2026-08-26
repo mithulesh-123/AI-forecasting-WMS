@@ -316,4 +316,5 @@ npm run db:seed   # optional demo data
 - Pluggable ML provider (Prophet/gradient boosting) behind `ForecastProvider`.
 - Distributed rate limiting via Upstash Redis.
 #   W M S - A I - f o r e c a s t i n g  
+ #   A I - f o r e c a s t i n g - W M S  
  
