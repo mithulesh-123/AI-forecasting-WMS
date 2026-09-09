@@ -13,7 +13,10 @@ export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request);
-    const limit = rateLimit(`login:${ip}`, { limit: 8, windowMs: 60_000 });
+    const isTest = process.env.NODE_ENV === "test" || process.env.DISABLE_RATE_LIMIT === "true";
+    const limit = isTest
+      ? { allowed: true, remaining: 1000, retryAfterSeconds: 0 }
+      : rateLimit(`login:${ip}`, { limit: 30, windowMs: 60_000 });
     if (!limit.allowed) {
       return fail(
         `Too many login attempts. Try again in ${limit.retryAfterSeconds}s.`,

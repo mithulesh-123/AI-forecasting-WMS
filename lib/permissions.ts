@@ -52,6 +52,7 @@ export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     "forecast:run",
   ],
   WAREHOUSE_STAFF: [
+    "dashboard:read",
     "products:read",
     "warehouses:read",
     "inventory:read",
