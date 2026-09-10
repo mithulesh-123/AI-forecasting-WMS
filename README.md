@@ -132,6 +132,39 @@ middleware.ts
 
 ---
 
+## Running with Docker (Quickstart)
+
+The repository is fully Dockerized with a multi-stage `Dockerfile` and `docker-compose.yml` (PostgreSQL + Next.js standalone runner with auto-migration).
+
+### 1. Start the entire stack
+
+```bash
+docker compose up --build -d
+```
+
+The app will be available at: **http://localhost:3000**
+
+### 2. Seed demo data in Docker
+
+To seed the initial demo data (users, warehouses, products, historical movements, dispatches, forecasts):
+
+```bash
+docker compose exec app npx tsx prisma/seed.ts
+# or via npm script:
+npm run docker:seed
+```
+
+### 3. Docker Management Commands
+
+```bash
+npm run docker:up     # start services in the background
+npm run docker:down   # stop all services
+npm run docker:logs   # view live logs
+npm run docker:seed   # seed database inside container
+```
+
+---
+
 ## Getting started (local)
 
 ### 1. Prerequisites

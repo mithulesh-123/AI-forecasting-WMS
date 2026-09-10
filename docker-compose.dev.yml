@@ -1,0 +1,54 @@
+name: nexus-wms-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: wms-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: wms_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d wms_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - wms-dev-network
+
+  app:
+    image: node:20-alpine
+    container_name: wms-app-dev
+    working_dir: /app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/wms_db?schema=public
+      DIRECT_URL: postgresql://postgres:postgres@postgres:5432/wms_db?schema=public
+      AUTH_SECRET: nexuswms_dev_secret_key_32_characters_minimum_length
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+    command: sh -c "apk add --no-cache libc6-compat openssl && npm install && npx prisma generate && npx prisma migrate deploy && npm run dev"
+    networks:
+      - wms-dev-network
+
+volumes:
+  postgres_dev_data:
+    driver: local
+
+networks:
+  wms-dev-network:
+    driver: bridge
