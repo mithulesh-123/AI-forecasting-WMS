@@ -155,9 +155,9 @@ export function EditWarehouseDialog({
   return (
     <Dialog open={open} onOpenChange={(o) => !loading && setOpen(o)}>
       <DialogTrigger asChild>
-        <button type="button" className="flex w-full items-center gap-2">
-          <Pencil /> Edit
-        </button>
+        <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2 text-xs" aria-label={`Edit ${warehouse.name}`}>
+          <Pencil className="h-3.5 w-3.5" /> Edit
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

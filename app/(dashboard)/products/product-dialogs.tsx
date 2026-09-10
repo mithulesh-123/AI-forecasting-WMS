@@ -130,9 +130,9 @@ export function EditProductDialog({
   return (
     <Dialog open={open} onOpenChange={(o) => !loading && setOpen(o)}>
       <DialogTrigger asChild>
-        <button type="button" className="flex w-full items-center gap-2" aria-label={`Edit ${product.name}`}>
-          <Pencil /> Edit
-        </button>
+        <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2 text-xs" aria-label={`Edit ${product.name}`}>
+          <Pencil className="h-3.5 w-3.5" /> Edit
+        </Button>
       </DialogTrigger>
       <DialogContent className="max-w-xl">
         <DialogHeader>
@@ -176,13 +176,14 @@ export function DeleteProductDialog({ product }: { product: ProductDto }) {
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <button
-          type="button"
-          className="flex w-full items-center gap-2 text-destructive focus:text-destructive"
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 gap-1.5 px-2 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
           aria-label={`Delete ${product.name}`}
         >
-          <Trash2 /> Delete
-        </button>
+          <Trash2 className="h-3.5 w-3.5" /> Delete
+        </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

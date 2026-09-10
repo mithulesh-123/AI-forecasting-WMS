@@ -11,7 +11,7 @@ export interface ForecastProvider {
   generate(input: ForecastInput): Promise<ForecastResult>;
 }
 
-class LocalStatisticalProvider implements ForecastProvider {
+export class LocalStatisticalProvider implements ForecastProvider {
   readonly name = "local-statistical";
 
   async generate(input: ForecastInput): Promise<ForecastResult> {
@@ -19,6 +19,10 @@ class LocalStatisticalProvider implements ForecastProvider {
     // for network-backed providers.
     return generateForecast(input);
   }
+}
+
+export function getLocalForecastProvider(): ForecastProvider {
+  return new LocalStatisticalProvider();
 }
 
 /**

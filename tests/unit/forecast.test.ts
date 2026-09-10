@@ -144,3 +144,14 @@ describe("ceilToMultiple", () => {
     expect(ceilToMultiple(10.4, 0)).toBe(11);
   });
 });
+
+describe("getLocalForecastProvider", () => {
+  it("returns the local-statistical provider reliably", async () => {
+    const { getLocalForecastProvider } = await import("@/lib/ai/provider");
+    const provider = getLocalForecastProvider();
+    expect(provider.name).toBe("local-statistical");
+    const res = await provider.generate(baseInput());
+    expect(res.predictions).toHaveLength(30);
+  });
+});
+

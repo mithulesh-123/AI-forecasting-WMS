@@ -12,22 +12,24 @@ export async function GET(request: NextRequest) {
   try {
     await requirePermission("warehouses:read");
     const query = warehouseQuerySchema.parse(Object.fromEntries(request.nextUrl.searchParams));
+    const where = query.q
+      ? {
+          OR: [
+            { name: { contains: query.q, mode: "insensitive" as const } },
+            { code: { contains: query.q, mode: "insensitive" as const } },
+            { location: { contains: query.q, mode: "insensitive" as const } },
+          ],
+        }
+      : {};
+
     const [items, total] = await Promise.all([
       db.warehouse.findMany({
-        where: query.q
-          ? {
-              OR: [
-                { name: { contains: query.q, mode: "insensitive" } },
-                { code: { contains: query.q, mode: "insensitive" } },
-                { location: { contains: query.q, mode: "insensitive" } },
-              ],
-            }
-          : {},
+        where,
         orderBy: { [query.sort]: query.order },
         skip: (query.page - 1) * query.perPage,
         take: query.perPage,
       }),
-      db.warehouse.count(),
+      db.warehouse.count({ where }),
     ]);
     return ok({ items, total, page: query.page, perPage: query.perPage });
   } catch (error) {

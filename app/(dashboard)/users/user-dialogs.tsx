@@ -173,9 +173,9 @@ export function EditUserDialog({
   return (
     <Dialog open={open} onOpenChange={(o) => !loading && setOpen(o)}>
       <DialogTrigger asChild>
-        <button type="button" className="flex w-full items-center gap-2">
-          <Pencil /> Edit
-        </button>
+        <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2 text-xs" aria-label={`Edit ${user.name}`}>
+          <Pencil className="h-3.5 w-3.5" /> Edit
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -246,14 +246,16 @@ export function ToggleUserActiveButton({
   }
 
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
+      size="sm"
       disabled={loading}
       onClick={() => void toggle()}
-      className="flex w-full items-center gap-2 disabled:opacity-50"
+      className={`h-8 gap-1.5 px-2 text-xs ${isActive ? "text-destructive hover:bg-destructive/10 hover:text-destructive" : "text-primary hover:bg-primary/10 hover:text-primary"}`}
     >
-      {loading ? <Loader2 className="animate-spin" /> : <Power />}
+      {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Power className="h-3.5 w-3.5" />}
       {isActive ? "Deactivate" : "Activate"}
-    </button>
+    </Button>
   );
 }

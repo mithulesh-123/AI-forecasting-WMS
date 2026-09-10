@@ -80,10 +80,12 @@ export default async function ProductsPage({ searchParams }: PageProps) {
 
   function sortHref(sortValue: string): string {
     const sp = new URLSearchParams();
+    const newOrder = query.sort === sortValue && query.order === "asc" ? "desc" : "asc";
     Object.entries(query).forEach(([k, v]) => {
-      if (v && k !== "sort") sp.set(k, String(v));
+      if (v && k !== "sort" && k !== "order") sp.set(k, String(v));
     });
     sp.set("sort", sortValue);
+    sp.set("order", newOrder);
     return `/products?${sp.toString()}`;
   }
 

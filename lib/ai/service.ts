@@ -3,7 +3,7 @@ import type { ForecastHorizon, Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { NotFoundError } from "@/lib/errors";
 import { HISTORY_WINDOW_DAYS } from "@/lib/constants";
-import { getForecastProvider } from "./provider";
+import { getForecastProvider, getLocalForecastProvider } from "./provider";
 import type { DemandPoint, ForecastInput, ForecastResult } from "./types";
 
 type HorizonDays = 7 | 14 | 30;
@@ -94,8 +94,7 @@ export async function runProductForecast(
     // External providers must never break forecasting - degrade to local math.
     if (provider.name === "local-statistical") throw error;
     console.warn("[forecast] external provider failed, using local engine:", error);
-    const local = getForecastProvider();
-    result = await (local.name === "local-statistical" ? local.generate(input) : Promise.reject(error));
+    result = await getLocalForecastProvider().generate(input);
   }
 
   if (options.persist) {
