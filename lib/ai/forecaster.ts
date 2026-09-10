@@ -42,7 +42,7 @@ function holtLinear(history: number[]): HoltState {
 }
 
 /** Multiplicative weekday factors shrunk toward 1.0 with limited data. */
-function weeklyFactors(history: number[], startDate: string): number[] {
+export function weeklyFactors(history: number[], startDate: string): number[] {
   const sums = Array.from({ length: 7 }, () => 0);
   const counts = Array.from({ length: 7 }, () => 0);
   history.forEach((demand, i) => {

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { PackageSearch, ShieldCheck, TrendingUp } from "lucide-react";
+import { getCurrentUser } from "@/lib/auth/session";
 import { LoginForm } from "@/components/auth/login-form";
 
 export const metadata: Metadata = { title: "Sign in" };
@@ -15,6 +17,11 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{ next?: string }>;
 }) {
+  const user = await getCurrentUser();
+  if (user) {
+    redirect("/dashboard");
+  }
+
   const params = await searchParams;
 
   return (

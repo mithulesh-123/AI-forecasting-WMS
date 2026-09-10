@@ -418,33 +418,47 @@ async function main() {
     });
   }
 
-  // Deliberately drive two SKUs into LOW / OUT territory via real movements
-  // so the dashboard shows meaningful risk states.
-  const drainTargets = [
-    { sku: "ELC-1001", leaveBelowReorder: true },
-    { sku: "APP-7002", leaveBelowReorder: false },
-  ];
-  for (const target of drainTargets) {
-    const product = CATALOG.find((c) => c.sku === target.sku)!;
-    for (const wh of warehouses) {
+  // Calibrate stock distribution across SKUs and depots to model realistic multi-tiered risk profiles
+  for (const [pIndex, product] of CATALOG.entries()) {
+    for (const [wIndex, wh] of warehouses.entries()) {
       const current = getStock(product.id, wh.id);
       if (current <= 0) continue;
-      const newQty = target.leaveBelowReorder
-        ? Math.max(1, Math.floor(product.reorderLevel * 0.6))
-        : 0;
-      const delta = newQty - current; // negative drain
-      if (delta >= 0) continue;
-      stock.set(key(product.id, wh.id), newQty);
+
+      // Determine inventory profile bucket across 10 distribution buckets
+      const bucket = (pIndex * 7 + wIndex * 13) % 10;
+      let targetStock = current;
+
+      if (bucket === 0) {
+        // 0 stock -> CRITICAL
+        targetStock = 0;
+      } else if (bucket === 1 || bucket === 2) {
+        // Very low stock (2 to 8 units) -> CRITICAL
+        targetStock = Math.max(1, Math.floor(product.reorderLevel * 0.35));
+      } else if (bucket === 3 || bucket === 4) {
+        // Low stock (9 to 25 units) -> HIGH
+        targetStock = Math.max(6, Math.floor(product.reorderLevel * 0.85));
+      } else if (bucket === 5 || bucket === 6) {
+        // Approaching buffer (30 to 70 units) -> MEDIUM
+        targetStock = Math.max(16, Math.floor(product.reorderLevel * 1.45));
+      } else {
+        // Healthy stock (80 to 250 units) -> LOW
+        targetStock = Math.max(45, Math.floor(product.reorderLevel * 3.2));
+      }
+
+      const delta = targetStock - current;
+      if (delta === 0) continue;
+
+      stock.set(key(product.id, wh.id), targetStock);
       movements.push({
         productId: product.id,
         warehouseId: wh.id,
-        type: "OUT",
+        type: delta < 0 ? "OUT" : "IN",
         quantityDelta: delta,
-        quantity: -delta,
-        reason: "Bulk wholesale fulfillment",
-        reference: `SO-BULK-${randInt(1000, 9999)}`,
+        quantity: Math.abs(delta),
+        reason: delta < 0 ? "Bulk store distribution" : "Supplier replenishment receipt",
+        reference: delta < 0 ? `SO-BULK-${randInt(1000, 9999)}` : `PO-SUP-${randInt(1000, 9999)}`,
         userId: manager.id,
-        createdAt: isoDaysAgo(randInt(1, 5)),
+        createdAt: isoDaysAgo(randInt(1, 4)),
       });
     }
   }

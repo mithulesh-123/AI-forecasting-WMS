@@ -19,6 +19,14 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: "/forecasting",
+        destination: "/forecast",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
